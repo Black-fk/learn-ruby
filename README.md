@@ -314,19 +314,179 @@ tarefas << Tarefa.new("Aprender Ruby")
 
 **Código Guiado:**
 ```ruby
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
 require 'socket'
+require 'net/http'
+require 'optparse'
+require 'timeout'
 
-puts "Digite o IP alvo:"
-alvo = gets.chomp
-
-[21, 22, 80, 443].each do |porta|
-  begin
-    socket = TCPSocket.new(alvo, porta)
-    puts "[+] Porta #{porta} aberta"
-    socket.close
-  rescue
-    puts "[-] Porta #{porta} fechada"
+class BasicScanner
+  def initialize
+    @options = {
+      host: nil,
+      ports: [80, 443, 8080, 22, 21],
+      wordlist: ['admin', 'login', 'wp-admin', 'backup', 'config'],
+      timeout: 5
+    }
+    parse_options
+    validate_options
   end
+
+  def run
+    puts "\n[+] Iniciando scan no alvo: #{@options[:host]}"
+    puts "[+] Hora de início: #{Time.now}\n"
+
+    scan_ports
+    scan_directories
+    test_basic_vulnerabilities
+
+    puts "\n[+] Scan concluído em: #{Time.now}"
+  end
+
+  private
+
+  def parse_options
+    OptionParser.new do |opts|
+      opts.banner = "Uso: #{$0} [opções]"
+
+      opts.on("-h", "--host HOST", "Host alvo (IP ou domínio)") do |h|
+        @options[:host] = h
+      end
+
+      opts.on("-p", "--ports PORT1,PORT2", Array, "Portas para scanear (padrão: 80,443,8080,22,21)") do |p|
+        @options[:ports] = p.map(&:to_i)
+      end
+
+      opts.on("-w", "--wordlist WORD1,WORD2", Array, "Lista de diretórios para testar") do |w|
+        @options[:wordlist] = w
+      end
+
+      opts.on("-t", "--timeout SECONDS", Integer, "Tempo limite para conexões (padrão: 5)") do |t|
+        @options[:timeout] = t
+      end
+    end.parse!
+  end
+
+  def validate_options
+    unless @options[:host]
+      puts "[-] Você deve especificar um host alvo"
+      exit(1)
+    end
+  end
+
+  def scan_ports
+    puts "\n[+] Verificando portas abertas..."
+
+    @options[:ports].each do |port|
+      begin
+        Timeout.timeout(@options[:timeout]) do
+          socket = TCPSocket.new(@options[:host], port)
+          puts "[+] Porta #{port}/tcp aberta"
+          socket.close
+        end
+      rescue Timeout::Error
+        puts "[-] Timeout na porta #{port}"
+      rescue Errno::ECONNREFUSED
+        # Porta fechada
+      rescue => e
+        puts "[-] Erro ao verificar porta #{port}: #{e.message}"
+      end
+    end
+  end
+
+  def scan_directories
+    puts "\n[+] Procurando diretórios comuns..."
+
+    http = Net::HTTP.new(@options[:host], 80)
+    http.open_timeout = @options[:timeout]
+    http.read_timeout = @options[:timeout]
+
+    @options[:wordlist].each do |dir|
+      begin
+        response = http.request(Net::HTTP::Get.new("/#{dir}"))
+        
+        case response.code.to_i
+        when 200..299
+          puts "[+] Diretório encontrado: /#{dir} (HTTP #{response.code})"
+        when 401, 403
+          puts "[!] Diretório protegido: /#{dir} (HTTP #{response.code})"
+        end
+      rescue => e
+        puts "[-] Erro ao verificar /#{dir}: #{e.message}"
+      end
+    end
+  end
+
+  def test_basic_vulnerabilities
+    puts "\n[+] Testando vulnerabilidades básicas..."
+
+    test_sql_injection
+    test_xss
+  end
+
+  def test_sql_injection
+    puts "\n[+] Testando SQL injection básico..."
+
+    payloads = [
+      "' OR '1'='1",
+      "admin'--",
+      "1' OR 1=1#"
+    ]
+
+    uri = URI("http://#{@options[:host]}/login.php")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.open_timeout = @options[:timeout]
+    http.read_timeout = @options[:timeout]
+
+    payloads.each do |payload|
+      begin
+        params = { 'username' => payload, 'password' => 'test' }
+        response = http.post(uri.path, URI.encode_www_form(params))
+
+        if response.body.downcase.include?('bem-vindo') || 
+           response.body.downcase.include?('welcome') || 
+           response['location']&.include?('dashboard')
+          puts "[!] Possível SQLi com payload: #{payload}"
+        end
+      rescue => e
+        puts "[-] Erro ao testar SQLi: #{e.message}"
+      end
+    end
+  end
+
+  def test_xss
+    puts "\n[+] Testando XSS básico..."
+
+    payloads = [
+      "<script>alert('XSS')</script>",
+      "<img src=x onerror=alert(1)>",
+      "\"><svg/onload=alert(1)>"
+    ]
+
+    uri = URI("http://#{@options[:host]}/search.php")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.open_timeout = @options[:timeout]
+    http.read_timeout = @options[:timeout]
+
+    payloads.each do |payload|
+      begin
+        response = http.get("#{uri.path}?q=#{URI.encode_www_form_component(payload)}")
+
+        if response.body.include?(payload)
+          puts "[!] Possível XSS com payload: #{payload}"
+        end
+      rescue => e
+        puts "[-] Erro ao testar XSS: #{e.message}"
+      end
+    end
+  end
+end
+
+if __FILE__ == $0
+  scanner = BasicScanner.new
+  scanner.run
 end
 ```
 
