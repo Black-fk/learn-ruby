@@ -1,3 +1,237 @@
+# **Roteiro Básico para Ensinar Ruby**  
+**(Do Zero à Programação Funcional em 4 Aulas)**  
+
+---
+
+## **Aula 1: Introdução à Sintaxe Ruby**  
+**Objetivo:** Familiarizar com a linguagem e lógica básica  
+
+### **1. Configuração (15 min)**  
+- Instalação do Ruby (Linux/Windows/Mac)  
+- Uso do IRB (Interactive Ruby Shell)  
+- Primeiro programa:  
+  ```ruby
+  puts "Olá, mundo!"  
+  ```
+
+### **2. Fundamentos (45 min)**  
+- **Variáveis e Tipos**:  
+  ```ruby
+  nome = "Alice"       # String  
+  idade = 30           # Integer  
+  preco = 19.99       # Float  
+  ativo = true        # Boolean  
+  ```
+
+- **Operadores Básicos**:  
+  ```ruby
+  soma = 5 + 3         # 8  
+  texto = "Oi " + "Ruby" # Concatenação  
+  ```
+
+- **Entrada de Usuário**:  
+  ```ruby
+  puts "Qual seu nome?"  
+  nome = gets.chomp  
+  ```
+
+### **3. Exercício Prático (30 min)**  
+**Calculadora Simples**:  
+```ruby
+puts "Digite um número:"  
+num1 = gets.to_f  
+puts "Digite outro número:"  
+num2 = gets.to_f  
+puts "Soma: #{num1 + num2}"  
+```
+
+---
+
+## **Aula 2: Estruturas de Controle e Coleções**  
+**Objetivo:** Dominar condicionais e loops  
+
+### **1. Condicionais (30 min)**  
+- **If/Else**:  
+  ```ruby
+  if idade >= 18  
+    puts "Adulto"  
+  else  
+    puts "Menor"  
+  end  
+  ```
+
+- **Case/When**:  
+  ```ruby
+  case nota  
+  when 9..10 then "A"  
+  when 7..8  then "B"  
+  else "Reprovado"  
+  end  
+  ```
+
+### **2. Arrays e Hashes (40 min)**  
+- **Array**:  
+  ```ruby
+  frutas = ["maçã", "banana", "laranja"]  
+  frutas[0]  # "maçã"  
+  ```
+
+- **Hash**:  
+  ```ruby
+  pessoa = { nome: "Carlos", idade: 25 }  
+  pessoa[:nome]  # "Carlos"  
+  ```
+
+### **3. Loops (30 min)**  
+- **While**:  
+  ```ruby
+  i = 0  
+  while i < 5  
+    puts i  
+    i += 1  
+  end  
+  ```
+
+- **Each**:  
+  ```ruby
+  (1..5).each { |n| puts n }  
+  ```
+
+### **Exercício:**  
+**Lista de Compras**:  
+```ruby
+itens = []  
+loop do  
+  puts "Digite um item (ou 'sair'):"  
+  item = gets.chomp  
+  break if item == "sair"  
+  itens << item  
+end  
+puts "Lista: #{itens.join(", ")}"  
+```
+
+---
+
+## **Aula 3: Métodos e Classes**  
+**Objetivo:** Introduzir programação orientada a objetos  
+
+### **1. Métodos (40 min)**  
+- **Definição**:  
+  ```ruby
+  def saudacao(nome)  
+    "Olá, #{nome}!"  
+  end  
+  puts saudacao("Maria")  
+  ```
+
+- **Parâmetros Default**:  
+  ```ruby
+  def somar(a, b = 10)  
+    a + b  
+  end  
+  somar(5)  # 15  
+  ```
+
+### **2. Classes (50 min)**  
+- **Classe Simples**:  
+  ```ruby
+  class Pessoa  
+    attr_accessor :nome, :idade  
+
+    def initialize(nome, idade)  
+      @nome = nome  
+      @idade = idade  
+    end  
+
+    def apresentar  
+      "Me chamo #{@nome} e tenho #{@idade} anos."  
+    end  
+  end  
+
+  pessoa1 = Pessoa.new("João", 30)  
+  puts pessoa1.apresentar  
+  ```
+
+### **Exercício:**  
+**Classe `ContaBancaria`**:  
+```ruby
+class ContaBancaria  
+  attr_reader :saldo  
+
+  def initialize(saldo_inicial = 0)  
+    @saldo = saldo_inicial  
+  end  
+
+  def depositar(valor)  
+    @saldo += valor  
+  end  
+end  
+```
+
+---
+
+## **Aula 4: Tópicos Avançados**  
+**Objetivo:** Explorar funcionalidades poderosas  
+
+### **1. Blocos e Yield (30 min)**  
+```ruby
+def repetir(vezes)  
+  vezes.times { yield }  
+end  
+
+repetir(3) { puts "Ruby!" }  
+```
+
+### **2. Módulos (30 min)**  
+```ruby
+module Matematica  
+  def self.dobro(num)  
+    num * 2  
+  end  
+end  
+
+puts Matematica.dobro(4)  # 8  
+```
+
+### **3. Trabalhando com Arquivos (30 min)**  
+```ruby
+# Escrever  
+File.write("arquivo.txt", "Conteúdo")  
+
+# Ler  
+puts File.read("arquivo.txt")  
+```
+
+### **Projeto Final:**  
+**Sistema de Tarefas**:  
+```ruby
+class Tarefa  
+  attr_accessor :descricao, :concluida  
+
+  def initialize(descricao)  
+    @descricao = descricao  
+    @concluida = false  
+  end  
+end  
+
+tarefas = []  
+tarefas << Tarefa.new("Aprender Ruby")  
+```
+
+---
+
+## **Fluxo Recomendado**  
+1. **Teoria** → 2. **Exemplos ao Vivo** → 3. **Exercícios Guiados** → 4. **Desafios Práticos**  
+
+**Dicas para Instrutor**:  
+- Use analogias (ex: classes como "receitas de bolo")  
+- Compare com outras linguagens (Python/JavaScript)  
+- Incentive a leitura da [Documentação Ruby](https://ruby-doc.org/)  
+
+**Material Extra**:  
+- [Ruby em 15 Minutos](https://www.ruby-lang.org/pt/documentation/quickstart/)  
+- [Exercícios no Codewars](https://www.codewars.com/?language=ruby)
+- 
 # **Scanner Básico de Segurança em Ruby - Documentação Completa**
 
 Este documento explica detalhadamente um scanner de segurança básico escrito em Ruby, que realiza verificações de portas abertas, diretórios web e testes básicos de vulnerabilidades (SQLi e XSS).
