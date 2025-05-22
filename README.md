@@ -4,7 +4,36 @@
 ---
 
 ## **Aula 1: Introdução à Sintaxe Ruby**  
-**Objetivo:** Familiarizar com a linguagem e lógica básica  
+# **Pesquisa Resumida sobre Ruby**  
+
+## **1. Visão Geral**  
+Ruby é uma linguagem de programação **interpretada**, **dinâmica** e **orientada a objetos**, criada em **1995** por **Yukihiro Matsumoto** ("Matz"). Destaca-se pela sintaxe elegante e produtividade, sendo amplamente usada em desenvolvimento web, automação e segurança da informação.  
+
+## **2. Características Principais**  
+- **Legível e expressiva** (prioriza a simplicidade)  
+- **Orientação a objetos pura** (tudo é um objeto)  
+- **Tipagem dinâmica e forte**  
+- **Gerenciamento automático de memória**  
+- **Ecossistema rico** (RubyGems, frameworks como Rails)  
+
+## **3. Aplicações em Segurança**  
+- Automação de testes de invasão (Metasploit, WPScan)  
+- Análise de vulnerabilidades web (SQLi, XSS)  
+- Processamento de logs e dados de segurança  
+
+## **4. Vantagens**  
+✔ Fácil aprendizado  
+✔ Alta produtividade  
+✔ Comunidade ativa  
+
+## **5. Limitações**  
+✖ Performance inferior a linguagens como C ou Go  
+✖ Menos popular que Python para scripts gerais  
+
+## **6. Curiosidade**  
+Ruby foi projetado para ser "natural, não simples", equilibrando flexibilidade e usabilidade. Seu sucesso em segurança deve-se à integração com ferramentas como o Metasploit Framework.  
+
+**"Ruby faz você escrever menos código para fazer mais."** — Filosofia da linguagem.
 
 ### **1. Configuração (15 min)**  
 - Instalação do Ruby (Linux/Windows/Mac)  
