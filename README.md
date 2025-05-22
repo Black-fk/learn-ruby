@@ -1,141 +1,569 @@
-# **Curso de Ruby para Segurança da Informação**  
-**Roteiro Detalhado das Aulas + Códigos de Exemplo**  
+# **Aulão de Ruby para Pentest v1**  
+**(Do Zero à Programação Funcional em 4 Aulas)**  
 
 ---
 
-## **Aula 1: Introdução ao Ruby e Automação Básica em Pentesting**  
-**Duração:** 1h30  
-**Objetivo:** Introduzir Ruby e criar scripts simples para reconhecimento em segurança.  
+## **Aula 1: Introdução à Sintaxe Ruby**  
+**Objetivo:** Familiarizar com a linguagem e lógica básica  
 
-### **Roteiro:**  
-1. **Introdução (15 min)**  
-   - O que é Ruby e por que usar em segurança?  
-   - Configuração do ambiente (`ruby -v`, `irb`).  
+### **1. Configuração (15 min)**  
+- Instalação do Ruby (Linux/Windows/Mac)  
+- Uso do IRB (Interactive Ruby Shell)  
+- Primeiro programa:  
+  ```ruby
+  puts "Olá, mundo!"  
+  ```
 
-2. **Sintaxe Básica (30 min)**  
-   - Variáveis, loops (`each`, `while`), métodos.  
-   - Exemplo:  
-     ```ruby
-     # Loop para ver portas
-     (1..10).each { |port| puts "Verificando porta #{port}" }
-     ```  
+### **2. Fundamentos (45 min)**  
+- **Variáveis e Tipos**:  
+  ```ruby
+  nome = "Alice"       # String  
+  idade = 30           # Integer  
+  preco = 19.99       # Float  
+  ativo = true        # Boolean  
+  ```
 
-3. **Manipulação de Strings e Arrays (20 min)**  
-   - Extrair subdomínios de um log:  
-     ```ruby
-     log = "admin.site.com, backup.site.com"
-     subdomains = log.split(", ")
-     puts subdomains
-     ```  
+- **Operadores Básicos**:  
+  ```ruby
+  soma = 5 + 3         # 8  
+  texto = "Oi " + "Ruby" # Concatenação  
+  ```
 
-4. **Prática: Scanner de Portas (25 min)**  
-   - Código completo (adaptável para IP externo):  
-     ```ruby
-     require 'socket'
+- **Entrada de Usuário**:  
+  ```ruby
+  puts "Qual seu nome?"  
+  nome = gets.chomp  
+  ```
 
-     def port_scan(ip, start_port, end_port)
-       (start_port..end_port).each do |port|
-         begin
-           socket = TCPSocket.new(ip, port)
-           puts "[+] #{ip}:#{port} — ABERTA"
-           socket.close
-         rescue
-           puts "[-] #{ip}:#{port} — FECHADA"
-         end
-       end
-     end
-
-     port_scan("127.0.0.1", 80, 100)
-     ```  
+### **3. Exercício Prático (30 min)**  
+**Calculadora Simples**:  
+```ruby
+puts "Digite um número:"  
+num1 = gets.to_f  
+puts "Digite outro número:"  
+num2 = gets.to_f  
+puts "Soma: #{num1 + num2}"  
+```
 
 ---
 
-## **Aula 2: Análise de Vulnerabilidades Web com Ruby**  
-**Duração:** 2h  
-**Objetivo:** Automar testes em aplicações web (fuzzing, scraping).  
+## **Aula 2: Estruturas de Controle e Coleções**  
+**Objetivo:** Dominar condicionais e loops  
 
-### **Roteiro:**  
-1. **Requisições HTTP (30 min)**  
-   - GET/POST com `net/http`:  
-     ```ruby
-     uri = URI("http://alvo.com/login")
-     response = Net::HTTP.post_form(uri, 'user' => 'admin', 'pass' => '123')
-     puts response.body
-     ```  
+### **1. Condicionais (30 min)**  
+- **If/Else**:  
+  ```ruby
+  if idade >= 18  
+    puts "Adulto"  
+  else  
+    puts "Menor"  
+  end  
+  ```
 
-2. **Web Scraping (40 min)**  
-   - Extrair links com `nokogiri`:  
-     ```ruby
-     require 'nokogiri'
-     require 'open-uri'
+- **Case/When**:  
+  ```ruby
+  case nota  
+  when 9..10 then "A"  
+  when 7..8  then "B"  
+  else "Reprovado"  
+  end  
+  ```
 
-     doc = Nokogiri::HTML(URI.open("http://alvo.com"))
-     doc.css('a').each { |link| puts link['href'] }
-     ```  
+### **2. Arrays e Hashes (40 min)**  
+- **Array**:  
+  ```ruby
+  frutas = ["maçã", "banana", "laranja"]  
+  frutas[0]  # "maçã"  
+  ```
 
-3. **Fuzzing de Parâmetros (50 min)**  
-   - Testar SQL Injection:  
-     ```ruby
-     payloads = ["' OR '1'='1", "'--", "admin'#"]
-     payloads.each do |payload|
-       res = Net::HTTP.get_response(URI("http://alvo.com?search=#{payload}"))
-       puts "Vulnerável!" if res.body.include?("error")
-     end
-     ```  
+- **Hash**:  
+  ```ruby
+  pessoa = { nome: "Carlos", idade: 25 }  
+  pessoa[:nome]  # "Carlos"  
+  ```
 
----
+### **3. Loops (30 min)**  
+- **While**:  
+  ```ruby
+  i = 0  
+  while i < 5  
+    puts i  
+    i += 1  
+  end  
+  ```
 
-## **Aula 3: Exploração Avançada e Criação de Ferramentas**  
-**Duração:** 2h30  
-**Objetivo:** Desenvolver exploits e ferramentas customizadas.  
+- **Each**:  
+  ```ruby
+  (1..5).each { |n| puts n }  
+  ```
 
-### **Roteiro:**  
-1. **Sniffing de Rede (40 min)**  
-   - Usando `packetfu` (instalar via `gem install packetfu`):  
-     ```ruby
-     require 'packetfu'
-
-     def sniff_packets
-       cap = PacketFu::Capture.new(iface: 'wlan0', start: true)
-       cap.stream.each do |pkt|
-         packet = PacketFu::Packet.parse(pkt)
-         puts packet.inspect if packet.is_tcp?
-       end
-     end
-     ```  
-
-2. **Quebra de Hashes (50 min)**  
-   - Força bruta em MD5:  
-     ```ruby
-     require 'digest'
-
-     target_hash = "5f4dcc3b5aa765d61d8327deb882cf99" # hash de 'password'
-     wordlist = ["123456", "password", "admin", "letmein"]
-
-     wordlist.each do |word|
-       if Digest::MD5.hexdigest(word) == target_hash
-         puts "[+] Senha encontrada: #{word}"
-         break
-       end
-     end
-     ```  
-
-3. **Exploit Básico (60 min)**  
-   - Buffer Overflow simulado:  
-     ```ruby
-     buffer = "A" * 500
-     puts "Exploit enviado: #{buffer}"
-     # Simulação: Servidor crasha com 500 'A's
-     ```  
+### **Exercício:**  
+**Lista de Compras**:  
+```ruby
+itens = []  
+loop do  
+  puts "Digite um item (ou 'sair'):"  
+  item = gets.chomp  
+  break if item == "sair"  
+  itens << item  
+end  
+puts "Lista: #{itens.join(", ")}"  
+```
 
 ---
 
-## **Material Extra por Aula**  
-- **Aula 1:**  
-  - [Ruby em 20 Minutos](https://www.ruby-lang.org/pt/documentation/quickstart/)  
-- **Aula 2:**  
-  - [Nokogiri Tutorial](https://nokogiri.org/tutorials/)  
-- **Aula 3:**  
-  - [PacketFu Docs](https://github.com/packetfu/packetfu)  
+## **Aula 3: Métodos e Classes**  
+**Objetivo:** Introduzir programação orientada a objetos  
 
-**Pronto para hackear (eticamente) com Ruby!** 🔒💻
+### **1. Métodos (40 min)**  
+- **Definição**:  
+  ```ruby
+  def saudacao(nome)  
+    "Olá, #{nome}!"  
+  end  
+  puts saudacao("Maria")  
+  ```
+
+- **Parâmetros Default**:  
+  ```ruby
+  def somar(a, b = 10)  
+    a + b  
+  end  
+  somar(5)  # 15  
+  ```
+
+### **2. Classes (50 min)**  
+- **Classe Simples**:  
+  ```ruby
+  class Pessoa  
+    attr_accessor :nome, :idade  
+
+    def initialize(nome, idade)  
+      @nome = nome  
+      @idade = idade  
+    end  
+
+    def apresentar  
+      "Me chamo #{@nome} e tenho #{@idade} anos."  
+    end  
+  end  
+
+  pessoa1 = Pessoa.new("João", 30)  
+  puts pessoa1.apresentar  
+  ```
+
+### **Exercício:**  
+**Classe `ContaBancaria`**:  
+```ruby
+class ContaBancaria  
+  attr_reader :saldo  
+
+  def initialize(saldo_inicial = 0)  
+    @saldo = saldo_inicial  
+  end  
+
+  def depositar(valor)  
+    @saldo += valor  
+  end  
+end  
+```
+
+---
+
+## **Aula 4: Tópicos Avançados**  
+**Objetivo:** Explorar funcionalidades poderosas  
+
+### **1. Blocos e Yield (30 min)**  
+```ruby
+def repetir(vezes)  
+  vezes.times { yield }  
+end  
+
+repetir(3) { puts "Ruby!" }  
+```
+
+### **2. Módulos (30 min)**  
+```ruby
+module Matematica  
+  def self.dobro(num)  
+    num * 2  
+  end  
+end  
+
+puts Matematica.dobro(4)  # 8  
+```
+
+### **3. Trabalhando com Arquivos (30 min)**  
+```ruby
+# Escrever  
+File.write("arquivo.txt", "Conteúdo")  
+
+# Ler  
+puts File.read("arquivo.txt")  
+```
+
+### **Projeto Final:**  
+**Sistema de Tarefas**:  
+```ruby
+class Tarefa  
+  attr_accessor :descricao, :concluida  
+
+  def initialize(descricao)  
+    @descricao = descricao  
+    @concluida = false  
+  end  
+end  
+
+tarefas = []  
+tarefas << Tarefa.new("Aprender Ruby")  
+```
+
+---
+
+## **Fluxo Recomendado**  
+1. **Teoria** → 2. **Exemplos ao Vivo** → 3. **Exercícios Guiados** → 4. **Desafios Práticos**  
+
+**Dicas para Instrutor**:  
+- Use analogias (ex: classes como "receitas de bolo")  
+- Compare com outras linguagens (Python/JavaScript)  
+- Incentive a leitura da [Documentação Ruby](https://ruby-doc.org/)  
+
+**Material Extra**:  
+- [Ruby em 15 Minutos](https://www.ruby-lang.org/pt/documentation/quickstart/)  
+- [Exercícios no Codewars](https://www.codewars.com/?language=ruby)
+# **Aula 1: Introdução ao Ruby para Segurança da Informação - Roteiro Detalhado**
+
+---
+
+## **Aulão de Ruby para Pentest v2**
+**Objetivo:** Apresentar o curso e despertar interesse.
+
+**Atividades:**
+- [ ] Breve introdução sobre Ruby (linguagem dinâmica, orientada a objetos)
+- [ ] Por que Ruby para segurança? 
+  - Linguagem favorita para scripts rápidos
+  - Usada no Metasploit Framework
+  - Sintaxe limpa e expressiva
+- [ ] Exemplo real: Mostrar um script simples de verificação de portas
+
+**Slide de Apoio:**  
+*"Ruby: A linguagem que alimenta ferramentas profissionais de pentesting"*
+
+---
+
+## **2. Configuração do Ambiente (15 minutos)**
+**Objetivo:** Todos com ambiente funcionando.
+
+**Passo a Passo:**
+1. Instalação no Linux:
+   ```bash
+   sudo apt update && sudo apt install ruby -y
+   ```
+2. Verificação:
+   ```bash
+   ruby -v
+   ```
+3. Teste no IRB (Interactive Ruby Shell):
+   ```ruby
+   puts "Hello, Hackers!"
+   ```
+
+**Atividade Prática:**  
+- Todos executam `ruby -v` e testam um comando simples no IRB
+
+**Dica:**  
+*Mostrar atalhos do IRB (Ctrl+C para sair, Tab para autocompletar)*
+
+---
+
+## **3. Fundamentos de Ruby (30 minutos)**
+**Objetivo:** Ensinar sintaxe essencial para scripts de segurança.
+
+**Tópicos:**
+1. **Variáveis e Tipos Básicos**
+   ```ruby
+   alvo = "192.168.1.1"
+   portas = [80, 443, 22, 3389]
+   ```
+   
+2. **Estruturas de Controle**
+   ```ruby
+   # If/Else
+   if porta == 80
+     puts "Serviço HTTP"
+   end
+
+   # Loops
+   3.times { puts "Testando..." }
+   ```
+
+3. **Métodos**
+   ```ruby
+   def scan_port(ip, porta)
+     # Lógica aqui
+   end
+   ```
+
+**Exercício Interativo:**  
+*Perguntar: "Como criar um array com portas comuns?" e deixar alunos tentarem no IRB*
+
+---
+
+## **4. Hands-on: Scanner de Portas (30 minutos)**
+**Objetivo:** Primeiro script funcional.
+
+**Código Guiado:**
+```ruby
+require 'socket'
+
+puts "Digite o IP alvo:"
+alvo = gets.chomp
+
+[21, 22, 80, 443].each do |porta|
+  begin
+    socket = TCPSocket.new(alvo, porta)
+    puts "[+] Porta #{porta} aberta"
+    socket.close
+  rescue
+    puts "[-] Porta #{porta} fechada"
+  end
+end
+```
+
+**Passo a Passo:**
+1. Explicar `require 'socket'` (biblioteca padrão)
+2. Mostrar como `TCPSocket` funciona
+3. Explicar tratamento de erros com `begin/rescue`
+
+**Desafio Opcional:**  
+*"Quem consegue modificar para verificar um range de portas (ex: 1-100)?"*
+
+---
+
+## **5. Caso Real: Análise de Logs (15 minutos)**
+**Objetivo:** Mostrar aplicação prática.
+
+**Exemplo:**
+```ruby
+log = "2023-01-01 10:00:45 - Tentativa de login falho: admin
+       2023-01-01 10:01:12 - Tentativa de login falho: root"
+
+# Contar tentativas falhas
+tentativas = log.scan(/login falho/).count
+puts "Alert: #{tentativas} tentativas de invasão!"
+```
+
+**Discussão:**  
+*Como isso seria útil em um SIEM?*
+
+---
+
+## **6. Encerramento (10 minutos)**
+**Recapitulação:**
+1. Sintaxe básica de Ruby
+2. Primeiro script de rede
+3. Aplicações em segurança
+
+**Próximos Passos:**
+- Praticar modificações no scanner
+- Explorar a documentação Ruby
+
+**Q&A:**  
+*Responder dúvidas e sugerir exercícios extras*
+
+---
+
+**Material Complementar:**
+- [Try Ruby Online](https://try.ruby-lang.org/)
+- [Ruby em 15 Minutos](https://www.ruby-lang.org/pt/documentation/quickstart/)
+
+**Tarefa de Casa:**  
+*Criar um script que:*
+1. Pede um domínio ao usuário
+2. Verifica se as portas 80 e 443 estão abertas
+3. Retorna "Possível servidor web" se alguma estiver aberta
+
+---
+
+**Dica para Instrutor:**  
+- Use analogias (ex: portas como portas de um shopping)
+- Relacione sempre com cenários reais de segurança
+- Mantenha o ritmo interativo com perguntas
+
+# **Aula 2: Análise de Vulnerabilidades Web com Ruby - Roteiro Detalhado**
+
+## **1. Abertura da Aula (15 minutos)**
+**Objetivo:** Contextualizar análise web e introduzir ferramentas.
+
+**Atividades:**
+- [ ] Introdução a vulnerabilidades web (OWASP Top 10)
+- [ ] Por que automatizar com Ruby?
+  - Flexibilidade para criar testes customizados
+  - Integração com outras ferramentas
+- [ ] Demonstração rápida de um scanner de diretórios
+
+**Slide de Apoio:**  
+*"Automatizando testes web: Do reconhecimento à exploração"*
+
+---
+
+## **2. Fundamentos de HTTP em Ruby (25 minutos)**
+**Objetivo:** Dominar requisições web básicas.
+
+**Tópicos Práticos:**
+1. **Requisições GET**
+```ruby
+require 'net/http'
+response = Net::HTTP.get_response(URI('http://exemplo.com/admin'))
+puts response.code  # => "200"
+```
+
+2. **Enviando POST com parâmetros**
+```ruby
+uri = URI('http://exemplo.com/login')
+res = Net::HTTP.post_form(uri, 'username' => 'admin', 'password' => '12345')
+puts res.body
+```
+
+**Exercício Dirigido:**  
+*Modificar o código para:*
+- Enviar um header User-Agent personalizado
+- Lidar com redirecionamentos (código 301/302)
+
+---
+
+## **3. Web Scraping para Reconhecimento (30 minutos)**
+**Objetivo:** Extrair informações estratégicas.
+
+**Código Guiado (Nokogiri):**
+```ruby
+require 'nokogiri'
+require 'open-uri'
+
+doc = Nokogiri::HTML(URI.open("http://exemplo.com"))
+# Extrair todos os formulários
+doc.css('form').each do |form|
+  puts "Formulário encontrado: Ação #{form['action']}"
+end
+```
+
+**Caso Real:**  
+*Identificar:*
+- Campos de login
+- Endpoints API expostos
+- Comentários HTML com informações sensíveis
+
+---
+
+## **4. Fuzzing Básico (35 minutos)**
+**Objetivo:** Automatizar testes de injeção.
+
+**Exemplo Prático (SQLi Testing):**
+```ruby
+payloads = ["' OR '1'='1", "admin'--", "' UNION SELECT null,username,password FROM users--"]
+payloads.each do |payload|
+  uri = URI("http://exemplo.com/search?q=#{URI.encode_www_form_component(payload)}")
+  res = Net::HTTP.get(uri)
+  puts "Vulnerável com #{payload}" if res.include?("error in your SQL syntax")
+end
+```
+
+**Discussão Ética:**  
+*Quando parar o teste? Como documentar achados?*
+
+---
+
+## **5. Encerramento (15 minutos)**
+**Próximos Passos:**  
+- Introduzir autenticação em testes
+- Trabalhar com sessões e cookies
+
+**Tarefa:**  
+*Criar um script que:*
+1. Testa 3 URLs contra XSS básico
+2. Gera um relatório em formato CSV
+
+---
+
+# **Aula 3: Exploração Avançada - Roteiro Detalhado**
+
+## **1. Warm-up: Revisão Rápida (10 minutos)**
+**Atividade Interativa:**  
+*"Qual foi o desafio mais interessante da aula 2?"*
+
+---
+
+## **2. Sniffing de Rede (40 minutos)**
+**Demo com PacketFu:**
+```ruby
+require 'packetfu'
+
+def packet_capture
+  cap = PacketFu::Capture.new(iface: 'eth0', start: true)
+  cap.stream.each do |pkt|
+    packet = PacketFu::Packet.parse(pkt)
+    next unless packet.is_tcp?
+    puts "Packet: #{packet.ip_saddr}:#{packet.tcp_sport} -> #{packet.ip_daddr}:#{packet.tcp_dport}"
+  end
+end
+```
+
+**Exercício Prático:**  
+*Filtrar apenas pacotes HTTP e extrair URLs*
+
+---
+
+## **3. Quebra de Hashes (45 minutos)**
+**Código Didático:**
+```ruby
+require 'digest'
+
+def crack_hash(hash, wordlist)
+  File.foreach(wordlist) do |password|
+    password.chomp!
+    if Digest::SHA256.hexdigest(password) == hash
+      return password
+    end
+  end
+  nil
+end
+
+# Uso:
+crack_hash("5e8848...", "rockyou.txt")
+```
+
+**Otimização:**  
+*Adicionar progress bar e salt detection*
+
+---
+
+## **4. Construindo um Exploit Simples (50 minutos)**
+**Exemplo Didático (Buffer Overflow Simulado):**
+```ruby
+# Gerador de payload
+def exploit
+  junk = "A" * 1024  # Preenche o buffer
+  eip = "\x42\x42\x42\x42"  # Sobrescreve EIP
+  payload = junk + eip
+  send_to_vulnerable_app(payload)
+end
+```
+
+**Discussão:**  
+*Como adaptar para casos reais?*
+
+---
+
+## **5. Encerramento do Módulo (15 minutos)**
+**Roadmap Avançado:**  
+- Integração com Metasploit
+- Análise de malware em Ruby
+
+**Projeto Final:**  
+*Desenvolver uma ferramenta completa que:*
+1. Faz reconhecimento
+2. Testa vulnerabilidades
+3. Gera relatórios
+
+**Material Extra:**  
+[Ruby Security Projects no GitHub]
